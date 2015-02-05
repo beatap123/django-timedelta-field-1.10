@@ -86,9 +86,24 @@ class TimedeltaField(six.with_metaclass(models.SubfieldBase, models.Field)):
         return COLUMN_TYPES[connection.settings_dict['ENGINE']]
 
     def deconstruct(self):
+        """
+        Break down this field into arguments that can be used to reproduce it
+        with Django migrations.
+
+        The thing to to note here is that currently the migration file writer
+        can't serialize timedelta objects so we convert them to an integer
+        representation (in seconds) that we can later interpret as a timedelta.
+        """
+
         name, path, args, kwargs = super(TimedeltaField, self).deconstruct()
-        if self._min_value is not None:
-            kwargs['min_value'] = self._min_value
-        if self._max_value is not None:
-            kwargs['max_value'] = self._max_value
+
+        if isinstance(self._min_value, datetime.timedelta):
+            kwargs['min_value'] = int(self._min_value.total_seconds())
+
+        if isinstance(self._max_value, datetime.timedelta):
+            kwargs['max_value'] = int(self._max_value.total_seconds())
+
+        if isinstance(kwargs.get('default'), datetime.timedelta):
+            kwargs['default'] = int(kwargs['default'].total_seconds())
+
         return name, path, args, kwargs
