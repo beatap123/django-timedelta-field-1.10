@@ -26,7 +26,15 @@ class TimedeltaField(six.with_metaclass(models.SubfieldBase, models.Field)):
     
     def __init__(self, *args, **kwargs):
         self._min_value = kwargs.pop('min_value', None)
+
+        if isinstance(self._min_value, int):
+            self._min_value = datetime.timedelta(seconds=self._min_value)
+
         self._max_value = kwargs.pop('max_value', None)
+
+        if isinstance(self._max_value, int):
+            self._max_value = datetime.timedelta(seconds=self._max_value)
+
         super(TimedeltaField, self).__init__(*args, **kwargs)
     
     def to_python(self, value):
