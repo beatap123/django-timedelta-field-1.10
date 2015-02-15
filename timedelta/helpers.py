@@ -13,7 +13,7 @@ def nice_repr(timedelta, display="long", sep=", "):
     """
     Turns a datetime.timedelta object into a nice string repr.
 
-    display can be "minimal", "short" or "long" [default].
+    display can be "sql", "iso8601", "minimal", "short" or "long" [default].
 
     >>> from datetime import timedelta as td
     >>> nice_repr(td(days=1, hours=2, minutes=3, seconds=4))
@@ -69,6 +69,8 @@ def nice_repr(timedelta, display="long", sep=", "):
     if display == "sql":
         days += weeks * 7
         return "%i %02i:%02i:%02i" % (days, hours, minutes, seconds)
+    elif display == "iso8601":
+        return iso8601_repr(timedelta)
     elif display == 'minimal':
         words = ["w", "d", "h", "m", "s"]
     elif display == 'short':
