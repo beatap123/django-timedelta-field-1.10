@@ -94,6 +94,23 @@ class TimedeltaModelFieldTest(TestCase):
         test.field = 86401.0
         self.assertRaises(ValidationError, test.full_clean)
         
+    def test_deconstruct(self):
+        """
+        Check that the deconstruct() method of TimedeltaField is returning the
+        min_value, max_value and default kwargs as floats.
+        """
+
+        field = TimedeltaField(
+            min_value=datetime.timedelta(minutes=5),
+            max_value=datetime.timedelta(minutes=15),
+            default=datetime.timedelta(minutes=30),
+        )
+
+        kwargs = field.deconstruct()[3]
+        self.assertEqual(kwargs['default'], 1800.0)
+        self.assertEqual(kwargs['max_value'], 900.0)
+        self.assertEqual(kwargs['min_value'], 300.0)
+
     def test_load_from_db(self):
         obj = MinMaxTestModel.objects.create(min='2 days', max='2 minutes', minmax='3 days')
         self.assertEquals(datetime.timedelta(2), obj.min)
