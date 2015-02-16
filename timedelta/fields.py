@@ -27,12 +27,12 @@ class TimedeltaField(six.with_metaclass(models.SubfieldBase, models.Field)):
     def __init__(self, *args, **kwargs):
         self._min_value = kwargs.pop('min_value', None)
 
-        if isinstance(self._min_value, int):
+        if isinstance(self._min_value, (int, float)):
             self._min_value = datetime.timedelta(seconds=self._min_value)
 
         self._max_value = kwargs.pop('max_value', None)
 
-        if isinstance(self._max_value, int):
+        if isinstance(self._max_value, (int, float)):
             self._max_value = datetime.timedelta(seconds=self._max_value)
 
         super(TimedeltaField, self).__init__(*args, **kwargs)
@@ -40,7 +40,7 @@ class TimedeltaField(six.with_metaclass(models.SubfieldBase, models.Field)):
     def to_python(self, value):
         if (value is None) or isinstance(value, datetime.timedelta):
             return value
-        if isinstance(value, int):
+        if isinstance(value, (int, float)):
             return datetime.timedelta(seconds=value)
         if value == "":
             if self.null:
@@ -99,19 +99,19 @@ class TimedeltaField(six.with_metaclass(models.SubfieldBase, models.Field)):
         with Django migrations.
 
         The thing to to note here is that currently the migration file writer
-        can't serialize timedelta objects so we convert them to an integer
+        can't serialize timedelta objects so we convert them to a float
         representation (in seconds) that we can later interpret as a timedelta.
         """
 
         name, path, args, kwargs = super(TimedeltaField, self).deconstruct()
 
         if isinstance(self._min_value, datetime.timedelta):
-            kwargs['min_value'] = int(self._min_value.total_seconds())
+            kwargs['min_value'] = self._min_value.total_seconds()
 
         if isinstance(self._max_value, datetime.timedelta):
-            kwargs['max_value'] = int(self._max_value.total_seconds())
+            kwargs['max_value'] = self._max_value.total_seconds()
 
         if isinstance(kwargs.get('default'), datetime.timedelta):
-            kwargs['default'] = int(kwargs['default'].total_seconds())
+            kwargs['default'] = kwargs['default'].total_seconds()
 
         return name, path, args, kwargs

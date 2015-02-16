@@ -15,7 +15,13 @@ class MinMaxTestModel(models.Model):
     min = TimedeltaField(min_value=datetime.timedelta(1))
     max = TimedeltaField(max_value=datetime.timedelta(1))
     minmax = TimedeltaField(min_value=datetime.timedelta(1), max_value=datetime.timedelta(7))
-    
+
+class IntTestModel(models.Model):
+    field = TimedeltaField(min_value=1, max_value=86400)
+
+class FloatTestModel(models.Model):
+    field = TimedeltaField(min_value=1.0, max_value=86400.0)
+
 class TimedeltaModelFieldTest(TestCase):
     def test_validate(self):
         test = MinMaxTestModel(
@@ -44,6 +50,50 @@ class TimedeltaModelFieldTest(TestCase):
         test.minmax = datetime.timedelta(6, hours=23, minutes=59, seconds=59)
         test.full_clean()
     
+    def test_from_int(self):
+        """
+        Check that integers can be used to define the min_value and max_value
+        arguments, and that when assigned an integer, TimedeltaField converts
+        to timedelta.
+        """
+
+        test = IntTestModel()
+
+        # valid
+        test.field = 3600
+        self.assertEquals(test.field, datetime.timedelta(seconds=3600))
+        test.full_clean()
+        
+        # invalid
+        test.field = 0
+        self.assertRaises(ValidationError, test.full_clean)
+
+        # also invalid
+        test.field = 86401
+        self.assertRaises(ValidationError, test.full_clean)
+
+    def test_from_float(self):
+        """
+        Check that floats can be used to define the min_value and max_value
+        arguments, and that when assigned a float, TimedeltaField converts
+        to timedelta.
+        """
+
+        test = FloatTestModel()
+
+        # valid
+        test.field = 3600.0
+        self.assertEquals(test.field, datetime.timedelta(seconds=3600))
+        test.full_clean()
+        
+        # invalid
+        test.field = 0.0
+        self.assertRaises(ValidationError, test.full_clean)
+
+        # also invalid
+        test.field = 86401.0
+        self.assertRaises(ValidationError, test.full_clean)
+        
     def test_load_from_db(self):
         obj = MinMaxTestModel.objects.create(min='2 days', max='2 minutes', minmax='3 days')
         self.assertEquals(datetime.timedelta(2), obj.min)
