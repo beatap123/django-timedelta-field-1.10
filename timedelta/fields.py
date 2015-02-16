@@ -26,13 +26,21 @@ class TimedeltaField(six.with_metaclass(models.SubfieldBase, models.Field)):
 
     def __init__(self, *args, **kwargs):
         self._min_value = kwargs.pop('min_value', None)
+
+        if isinstance(self._min_value, (int, float)):
+            self._min_value = datetime.timedelta(seconds=self._min_value)
+
         self._max_value = kwargs.pop('max_value', None)
+
+        if isinstance(self._max_value, (int, float)):
+            self._max_value = datetime.timedelta(seconds=self._max_value)
+
         super(TimedeltaField, self).__init__(*args, **kwargs)
 
     def to_python(self, value):
         if (value is None) or isinstance(value, datetime.timedelta):
             return value
-        if isinstance(value, int):
+        if isinstance(value, (int, float)):
             return datetime.timedelta(seconds=value)
         if value == "":
             if self.null:
@@ -86,9 +94,24 @@ class TimedeltaField(six.with_metaclass(models.SubfieldBase, models.Field)):
         return COLUMN_TYPES[connection.settings_dict['ENGINE']]
 
     def deconstruct(self):
+        """
+        Break down this field into arguments that can be used to reproduce it
+        with Django migrations.
+
+        The thing to to note here is that currently the migration file writer
+        can't serialize timedelta objects so we convert them to a float
+        representation (in seconds) that we can later interpret as a timedelta.
+        """
+
         name, path, args, kwargs = super(TimedeltaField, self).deconstruct()
-        if self._min_value is not None:
-            kwargs['min_value'] = self._min_value
-        if self._max_value is not None:
-            kwargs['max_value'] = self._max_value
+
+        if isinstance(self._min_value, datetime.timedelta):
+            kwargs['min_value'] = self._min_value.total_seconds()
+
+        if isinstance(self._max_value, datetime.timedelta):
+            kwargs['max_value'] = self._max_value.total_seconds()
+
+        if isinstance(kwargs.get('default'), datetime.timedelta):
+            kwargs['default'] = kwargs['default'].total_seconds()
+
         return name, path, args, kwargs
