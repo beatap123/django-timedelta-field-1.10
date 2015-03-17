@@ -1,7 +1,6 @@
 from django import template
 register = template.Library()
 
-# Don't really like using relative imports, but no choice here!
 from ..helpers import parse, nice_repr, iso8601_repr, total_seconds as _total_seconds
 
 
@@ -10,7 +9,10 @@ def timedelta(value, display="long"):
     if value is None:
         return value
     if isinstance(value, basestring):
-        value = parse(value)
+        try:
+            value = parse(value)
+        except TypeError:
+            return value
     return nice_repr(value, display)
 
 
