@@ -23,7 +23,7 @@ def main(db_engine='sqlite3'):
     global_settings.DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.{DB_ENGINE}'.format(**os.environ),
-            'NAME': 'django-timedelta',
+            'NAME': 'timedelta-{ENVNAME}'.format(**os.environ),
         }
     }
 
