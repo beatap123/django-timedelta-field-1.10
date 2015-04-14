@@ -25,6 +25,7 @@ def main(db_engine='sqlite3'):
             'ENGINE': 'django.db.backends.{DB_ENGINE}'.format(**os.environ),
             'NAME': 'timedelta-{ENVNAME}'.format(**os.environ),
             'USER': os.environ.get('DB_USER', ''),
+            'PASSWORD': os.environ.get('DB_PASSWORD', ''),
         }
     }
 
