@@ -84,7 +84,7 @@ class TimedeltaFormField(forms.Field):
         """
         
         super(TimedeltaFormField, self).clean(value)
-        if (value == '' value is None) and not self.required:
+        if (value == '' or value is None) and not self.required:
             return ''
         try:
             return parse(value)
