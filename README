@@ -180,6 +180,14 @@ to do this, but it may be useful.
 Changelog
 ----------
 
+0.7.9: Update PyPI classifiers/supported python versions.
+
+0.7.8: Fix for django migrations.
+
+0.7.7: Minor bugfix for template tag.
+
+0.7.4: Improve template tags so the content they render can be parsed.
+
 0.7.3: Bugfixes/more testing.
        Add alternative format for ISO8601 display: PT00:15:00, for instance.
 			 Note that values > timedelta(1) may not be displayed in this manner.
