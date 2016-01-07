@@ -5,5 +5,3 @@ dist/
 .tox
 .coverage/
 *.pyc
-venv/
-.idea/
