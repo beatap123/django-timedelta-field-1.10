@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils import six
+from django import VERSION
 
 from collections import defaultdict
 import datetime
@@ -15,7 +16,13 @@ COLUMN_TYPES = defaultdict(lambda:"char(20)")
 COLUMN_TYPES["django.db.backends.postgresql_psycopg2"] = "interval"
 COLUMN_TYPES["django.contrib.gis.db.backends.postgis"] = "interval"
 
-class TimedeltaField(six.with_metaclass(models.SubfieldBase, models.Field)):
+if VERSION >= (1, 8):
+    _FieldBase = models.Field
+else:  # Django < 1.8, deprecated code
+    _FieldBase = six.with_metaclass(models.SubfieldBase, models.Field)
+
+
+class TimedeltaField(_FieldBase):
     """
     Store a datetime.timedelta as an INTERVAL in postgres, or a
     CHAR(20) in other database backends.
