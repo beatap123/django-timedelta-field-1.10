@@ -56,6 +56,9 @@ class TimedeltaField(_FieldBase):
                 return datetime.timedelta(0)
         return parse(value)
 
+    def from_db_value(self, value, expression, connection, context):
+        return self.to_python(value)
+
     def get_prep_value(self, value):
         if self.null and value == "":
             return None

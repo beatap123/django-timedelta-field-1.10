@@ -65,8 +65,10 @@ class TimedeltaModelFieldTest(TestCase):
 
         # valid
         test.field = 3600
-        self.assertEquals(test.field, datetime.timedelta(seconds=3600))
+        if django.VERSION < (1, 7):
+            self.assertEquals(test.field, datetime.timedelta(seconds=3600))
         test.full_clean()
+        self.assertEquals(test.field, datetime.timedelta(seconds=3600))
 
         # invalid
         test.field = 0
@@ -87,8 +89,10 @@ class TimedeltaModelFieldTest(TestCase):
 
         # valid
         test.field = 3600.0
-        self.assertEquals(test.field, datetime.timedelta(seconds=3600))
+        if django.VERSION < (1, 7):
+            self.assertEquals(test.field, datetime.timedelta(seconds=3600))
         test.full_clean()
+        self.assertEquals(test.field, datetime.timedelta(seconds=3600))
 
         # invalid
         test.field = 0.0
@@ -118,6 +122,11 @@ class TimedeltaModelFieldTest(TestCase):
 
     def test_load_from_db(self):
         obj = MinMaxTestModel.objects.create(min='2 days', max='2 minutes', minmax='3 days')
+        if django.VERSION < (1, 7):
+            self.assertEquals(datetime.timedelta(2), obj.min)
+            self.assertEquals(datetime.timedelta(0, 120), obj.max)
+            self.assertEquals(datetime.timedelta(3), obj.minmax)
+        obj.full_clean()
         self.assertEquals(datetime.timedelta(2), obj.min)
         self.assertEquals(datetime.timedelta(0, 120), obj.max)
         self.assertEquals(datetime.timedelta(3), obj.minmax)
