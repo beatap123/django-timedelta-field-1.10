@@ -180,6 +180,8 @@ to do this, but it may be useful.
 Changelog
 ----------
 
+0.8.0: Django 1.10 support.
+
 0.7.9: Update PyPI classifiers/supported python versions.
 
 0.7.8: Fix for django migrations.
