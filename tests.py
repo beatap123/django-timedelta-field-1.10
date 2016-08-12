@@ -18,12 +18,12 @@ def main(db_engine='sqlite3'):
     global_settings.INSTALLED_APPS = (
         'django.contrib.auth',
         'django.contrib.contenttypes',
-        'timedelta',
+        'timedelta2',
     )
     global_settings.DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.{DB_ENGINE}'.format(**os.environ),
-            'NAME': 'timedelta-{ENVNAME}'.format(**os.environ),
+            'NAME': 'timedelta2-{ENVNAME}'.format(**os.environ),
             'USER': os.environ.get('DB_USER', ''),
             'PASSWORD': os.environ.get('DB_PASSWORD', ''),
         }
@@ -45,7 +45,7 @@ def main(db_engine='sqlite3'):
     if getattr(django, 'setup', None):
         django.setup()
 
-    failures = test_runner.run_tests(['timedelta'])
+    failures = test_runner.run_tests(['timedelta2'])
 
     sys.exit(failures)
 
